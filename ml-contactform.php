@@ -146,6 +146,7 @@ function mlcf_callback( $content , $templateTag=false) {
     {
     
             $recipient = get_option('mlcf_email');
+            $from_mail = get_option('mlcf_email_from');
 						$success_message = get_option('mlcf_success_message');
 						$success_message = stripslashes($success_message);
 
@@ -159,7 +160,7 @@ function mlcf_callback( $content , $templateTag=false) {
 						$headers .= "From: $name <$email>\n";
 						$headers .= "Content-Type: text/plain; charset=\"" . get_settings('blog_charset') . "\"\n";
 		        $header2  = "Reply-To:".$email."\n";
-		        $header2 .= "From: webmail@donkeymedia.eu\r\n";
+		        $header2 .= "From: ".$from_mail."\r\n";
             
              $message = "e-Mail from ".get_bloginfo("name")." Contact Form: \n\n";
              $message .= wordwrap($text, 80, "\n") . "\n\n";

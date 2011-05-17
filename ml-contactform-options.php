@@ -4,6 +4,7 @@
 add_option('mlcf_delete_options', true, 'mlcf'); // by default the text strings will be deleted on Plugin deactivation.
 add_option('mlcf_email', 'you@example.com', 'mlcf');
 add_option('mlcf_subject', '[:en]English email from donkeymedia.eu[:de]Deutsche e-Mail von donkeymedia.eu', 'mlcf');
+add_option('mlcf_email_from', 'contactform@yourdomain.com', 'mlcf');
 add_option('mlcf_success_message','[:en]Thank you! <br />email successfully sent[:de]Vielen Dank<br />e-Mail erfolgreich versandt', 'mlcf');
 add_option('mlcf_error_message', '[:en]<span class="red">Please fill in the required fields</span>[:de]<span class="red">Bitte füllen Sie alle notwendigen Felder aus</span>', 'mlcf');
 add_option('mlcf_error_wrong_mail', '[:en]<span class="red">Please check your email</span>[:de]<span class="red">Bitte überprüfen Sie ihre e-Mail Adresse</span>', 'mlcf');
@@ -23,6 +24,7 @@ if ('process' == $_POST['stage'])
   update_option('mlcf_delete_options', $_POST['mlcf_delete_options']);
   update_option('mlcf_email', $_POST['mlcf_email']);
   update_option('mlcf_subject', $_POST['mlcf_subject']);
+  update_option('mlcf_email_from', $_POST['mlcf_email_from']);
   update_option('mlcf_success_message', $_POST['mlcf_success_message']);
   update_option('mlcf_error_message', $_POST['mlcf_error_message']);
   update_option('mlcf_error_wrong_mail', $_POST['mlcf_error_wrong_mail']);
@@ -39,6 +41,7 @@ if ('process' == $_POST['stage'])
 $mlcf_delete_options = get_option('mlcf_delete_options') ? ' value="true" checked="checked"' : 'value="false"';
 $mlcf_email = stripslashes(get_option('mlcf_email'));
 $mlcf_subject = stripslashes(get_option('mlcf_subject'));
+$mlcf_email_from = stripslashes(get_option('mlcf_email_from'));
 $mlcf_success_message = stripslashes(get_option('mlcf_success_message'));
 $mlcf_error_message = stripslashes(get_option('mlcf_error_message'));
 $mlcf_error_wrong_mail = stripslashes(get_option('mlcf_error_wrong_mail'));
@@ -61,6 +64,12 @@ $mlcf_field_submit = stripslashes(get_option('mlcf_field_submit'));
         <td><input name="mlcf_email" type="text" id="mlcf_email" value="<?php echo $mlcf_email; ?>" size="40" />
         <br />
 <?php _e('This address is where the email will be sent to.', 'mlcf') ?></td>
+      </tr>
+      <tr valign="top">
+        <th scope="row"><?php _e('From e-mail Address:', 'mlcf') ?></th>
+        <td><input name="mlcf_email_from" type="text" id="mlcf_email_from" value="<?php echo $mlcf_email_from; ?>" size="40" />
+        <br />
+<?php _e('This address will be shown in the From Field in the mails you recive via the plugin', 'mlcf') ?></td>
       </tr>
       <tr valign="top">
         <th scope="row"><?php _e('Subject Suffix:', 'mlcf') ?></th>
