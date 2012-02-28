@@ -141,10 +141,46 @@ function mlcf_callback( $content , $templateTag=false) {
 		return $content;
 	}
   
+     //recaptcha
+        $recaptcha_html ='';
+        $recaptcha_enabled = false;
+        $recaptcha_check = false;
+        
+        if ( get_option('mlcf_recaptcha_enabled') ){
+            $recaptcha_check = true;
+            $recaptcha_enabled = true;
+            require_once('recaptchalib.php');
+            
+            // recaptcha HTML-Block
+            $recaptcha_html= recaptcha_get_html( stripslashes(get_option('mlcf_recaptcha_public')));
+
+            /**
+             *  Recaptcha Options (JS)
+             *
+             *  theme : "red" (default theme) or "white" or "blackglass" or "clean"
+             *  --> http://code.google.com/intl/de-DE/apis/recaptcha/docs/customization.html
+            **/ 
+             $recaptcha_js = '<script type="text/javascript"> var RecaptchaOptions = {
+                 theme : "white",
+                 lang : "'.substr( get_bloginfo('language'), 0, 2) .'", 
+                 }; </script>';
+            
+            // Check the captcha answer
+            if( isset($_POST['mlcf_stage']) ){
+              $recaptcha_response = recaptcha_check_answer (
+                                stripslashes(get_option('mlcf_recaptcha_private')),
+                                $_SERVER["REMOTE_ADDR"],
+                                $_POST["recaptcha_challenge_field"],
+                                $_POST["recaptcha_response_field"]
+                                );
+              if ($recaptcha_response->is_valid ) $recaptcha_check = false;
+            }
+            
+        }
+  
   // If the input check returns true (ie. there has been a submission & input is ok)
-    if(mlcf_check_input()) 
+    if( !$recaptcha_check and mlcf_check_input() ) 
     {
-    
             $recipient = get_option('mlcf_email');
             $from_mail = get_option('mlcf_email_from');
 						$success_message = get_option('mlcf_success_message');
@@ -172,12 +208,22 @@ function mlcf_callback( $content , $templateTag=false) {
              $message .= "IP: " . mlcf_getip();
              $message .= "\n_____________________________________________\n";
             
-            mail($recipient,utf8_decode($subject),$message,$header2);
-            $results = '<div class="mailsend">' . $success_message . '</div>';
-            echo $results;
+            if (mail($recipient,utf8_decode($subject),$message,$header2)){
+              $results = '<div class="mailsend">' . $success_message . '</div>';
+              echo $results;
+            }
     }
     else // Else show the form. If there are errors the strings will have updated during running the inputcheck.
-    {
+    {   
+        if($recaptcha_enabled){
+        
+            if(!$recaptcha_response->is_valid){
+             $recaptcha_html =  '<p class="error" >'.__(get_option('mlcf_recaptcha_error_msg'), 'mlcf').'</p>'. $recaptcha_html;
+            }
+        
+            echo $recaptcha_js; 
+        }
+        
         $form = '<div class="contactform">
         ' . $mlcf_strings['error'] . '
         	<form action="' . get_permalink() . '" method="post">
@@ -193,20 +239,21 @@ function mlcf_callback( $content , $templateTag=false) {
         		  <label for="mlcf_subject">' . __(get_option('mlcf_field_subject'), 'mlcf') . '</label>
         		</div>' . $mlcf_strings['subject'] . '
 
-            <div class="contactleft">
-              <label for="mlcf_message">' . __(get_option('mlcf_field_message'), 'mlcf') . '</label>
-            </div>' . $mlcf_strings['message'] . '        		
+                <div class="contactleft">
+                  <label for="mlcf_message">' . __(get_option('mlcf_field_message'), 'mlcf') . '</label>
+                </div>' . $mlcf_strings['message'] . '        		
 
         		<div class="contactleft">
         		  <label for="mlcf_www">' . __(get_option('mlcf_field_www'), 'mlcf') . '</label>
         		</div>' . $mlcf_strings['www'] . '
             
 	          <div class="contacrequired">' . __(get_option('mlcf_field_required'), 'mlcf') . '
-	          </div>
-	          <div class="contactright">
+	          </div>'.
+	          $recaptcha_html
+	          .'<div class="contactright">
                <input class="contactsubmit" type="submit" name="Submit" value="' . __(get_option('mlcf_field_submit'), 'mlcf') . '" id="contactsubmit" />
                <input type="hidden" name="mlcf_stage" value="process" />
-            </div>
+              </div>
         	</form>
         </div>';
         if ($templateTag){
@@ -284,9 +331,14 @@ function mclf_deactivate(){
     delete_option('mlcf_field_submit');
    }
 }
+/* don't let Tinymce remove all comments */
+function mlcf_mce_valid_elements($init){
+  $init['extended_valid_elements'] = '!--,'.$init['extended_valid_elements'];
+}
 
 /* Action calls for all functions */
 add_action('admin_menu', 'mlcf_add_options_page');
 add_filter('the_content', 'mlcf_callback', 7);
+add_filter('tiny_mce_before_init', 'mlcf_mce_valid_elements');
 
 ?>

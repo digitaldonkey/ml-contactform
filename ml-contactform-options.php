@@ -1,3 +1,40 @@
+<style type='text/css' title='text/css'>
+  .disabled{ color: #999; }
+</style>
+<script type='text/javascript'>
+  jQuery(document).ready(function(){
+  
+  // can I use jquery here??? 
+  
+  jQuery('#mlcf_recaptcha_enabled').bind('change', function(){
+      
+    if( jQuery(this).attr('checked') ){
+      jQuery('#mlcf_recaptcha_public, #mlcf_recaptcha_private').attr('disabled', false).removeClass('disabled');
+      jQuery('.mlcf_recaptcha_class_enabled').toggleClass('disabled');  
+    }
+    else{
+      jQuery('#mlcf_recaptcha_public, #mlcf_recaptcha_private').attr('disabled', true).addClass('disabled');
+      jQuery('.mlcf_recaptcha_class_enabled').toggleClass('disabled');  
+    }
+      
+  });
+  
+  jQuery('#submitform').click(function(){
+    
+    /* recaptcha validation */
+    if ( jQuery('#mlcf_recaptcha_enabled').attr('checked') ){
+        if ( jQuery('#mlcf_recaptcha_public').val().length < 8 || jQuery('#mlcf_recaptcha_private').val().length < 8 ){            
+            jQuery('#mlcf_recaptcha_public, #mlcf_recaptcha_private').css('border', '1px solid red');
+            alert('Please check you public and private key or Disable recaptcha support. Each should have at least 8 digits');
+            return false;
+        }
+        
+    }
+    
+  });
+
+});
+</script>
 <?php
 
 /*Lets add some default options if they don't exist*/
@@ -6,22 +43,33 @@ add_option('mlcf_email', 'you@example.com', 'mlcf');
 add_option('mlcf_subject', '[:en]English email from donkeymedia.eu[:de]Deutsche e-Mail von donkeymedia.eu', 'mlcf');
 add_option('mlcf_email_from', 'contactform@yourdomain.com', 'mlcf');
 add_option('mlcf_success_message','[:en]Thank you! <br />email successfully sent[:de]Vielen Dank<br />e-Mail erfolgreich versandt', 'mlcf');
-add_option('mlcf_error_message', '[:en]<span class="red">Please fill in the required fields</span>[:de]<span class="red">Bitte füllen Sie alle notwendigen Felder aus</span>', 'mlcf');
-add_option('mlcf_error_wrong_mail', '[:en]<span class="red">Please check your email</span>[:de]<span class="red">Bitte überprüfen Sie ihre e-Mail Adresse</span>', 'mlcf');
+add_option('mlcf_error_message', '[:en]<span class="error">Please fill in the required fields</span>[:de]<span class="error">Bitte füllen Sie alle notwendigen Felder aus</span>', 'mlcf');
+add_option('mlcf_error_wrong_mail', '[:en]<span class="error">Please check your email</span>[:de]<span class="error">Bitte überprüfen Sie ihre e-Mail Adresse</span>', 'mlcf');
 add_option('mlcf_field_name', '[:en]Name * [:de]Name * ', 'mlcf');
 add_option('mlcf_field_email', '[:en]Your e-mail * [:de] e-Mail * ', 'mlcf');
 add_option('mlcf_field_subject', '[:en]Subject[:de]Betreff', 'mlcf');
-add_option('mlcf_field_www', '[:en]Your website * [:de]Ihre Website * ', 'mlcf');
+add_option('mlcf_field_www', '[:en]Your website [:de]Ihre Website ', 'mlcf');
 add_option('mlcf_field_message', '[:en]Your message:[:de]Nachricht:', 'mlcf');
 add_option('mlcf_field_required', '[:en]* Please fill in the required fields[:de]* Bitte füllen Sie alle benötigten Felder aus', 'mlcf');
 add_option('mlcf_field_submit', '[:en]Submit[:de]Senden', 'mlcf');
 
+add_option('mlcf_recaptcha_enabled', false, 'mlcf');
+add_option('mlcf_recaptcha_private', '6Le-tcQSAAAAAF0zyxYijsjUOL3AnSJaLmN-IEw-', 'mlcf');
+add_option('mlcf_recaptcha_public', '6Le-tcQSAAAAADDyIpTh9wP8to_4HHeSMkp6KNTN', 'mlcf');
+add_option('mlcf_recaptcha_error_msg', '<span class="error">'."[:en]The reCAPTCHA wasn't entered correctly. Please try again</span>[:de]".'<span class="error">'."Das Captcha stimmt nicht.", 'mlcf');
+
+
+/*
+
+@TODO ERROR MESSAGE
+
+*/
+add_option('mlcf_recaptcha_errormsg', '6Le-tcQSAAAAADDyIpTh9wP8to_4HHeSMkp6KNTN', 'mlcf');
 
 
 /*check form submission and update options*/
 if ('process' == $_POST['stage'])
 {
-  update_option('mlcf_delete_options', $_POST['mlcf_delete_options']);
   update_option('mlcf_email', $_POST['mlcf_email']);
   update_option('mlcf_subject', $_POST['mlcf_subject']);
   update_option('mlcf_email_from', $_POST['mlcf_email_from']);
@@ -35,10 +83,14 @@ if ('process' == $_POST['stage'])
   update_option('mlcf_field_message', $_POST['mlcf_field_message']);
   update_option('mlcf_field_required', $_POST['mlcf_field_required']);
   update_option('mlcf_field_submit', $_POST['mlcf_field_submit']);
+  update_option('mlcf_recaptcha_enabled', $_POST['mlcf_recaptcha_enabled']);
+  update_option('mlcf_recaptcha_private', $_POST['mlcf_recaptcha_private']);
+  update_option('mlcf_recaptcha_public', $_POST['mlcf_recaptcha_public']);
+  update_option('mlcf_recaptcha_error_msg', $_POST['mlcf_recaptcha_error_msg']);
+  update_option('mlcf_delete_options', $_POST['mlcf_delete_options']);
 }
 
 /*Get options for form fields*/
-$mlcf_delete_options = get_option('mlcf_delete_options') ? ' value="true" checked="checked"' : 'value="false"';
 $mlcf_email = stripslashes(get_option('mlcf_email'));
 $mlcf_subject = stripslashes(get_option('mlcf_subject'));
 $mlcf_email_from = stripslashes(get_option('mlcf_email_from'));
@@ -52,15 +104,34 @@ $mlcf_field_www = stripslashes(get_option('mlcf_field_www'));
 $mlcf_field_message = stripslashes(get_option('mlcf_field_message'));
 $mlcf_field_required = stripslashes(get_option('mlcf_field_required'));
 $mlcf_field_submit = stripslashes(get_option('mlcf_field_submit'));
+
+if ( get_option('mlcf_recaptcha_enabled') ){
+
+  $mlcf_recaptcha_enabled = ' value="true" checked="checked"';
+  $mlcf_recaptcha_class_enabled ='mlcf_recaptcha_class_enabled';
+  $mlcf_recaptcha_error_msg =get_option('mlcf_recaptcha_error_msg');
+}else{
+  $mlcf_recaptcha_enabled = 'value="false"';
+  $mlcf_recaptcha_input_enabled = ' disabled="disabled" ';
+  $mlcf_recaptcha_class_enabled = 'mlcf_recaptcha_class_enabled disabled';
+}
+
+$mlcf_recaptcha_private = stripslashes(get_option('mlcf_recaptcha_private'));
+$mlcf_recaptcha_public = stripslashes(get_option('mlcf_recaptcha_public'));
+
+$mlcf_delete_options = get_option('mlcf_delete_options') ? ' value="true" checked="checked"' : 'value="false"';
 ?>
 
 <div class="wrap">
   <h2><?php _e('Contact Form Options', 'mlcf') ?></h2>
   <form name="form1" method="post" action="">
 	<input type="hidden" name="stage" value="process" />
-    <table width="100%" cellspacing="2" cellpadding="5" class="editform">
+	
+  <h3><?php _e('Contact email', 'mlcf') ?></h3>
+  <filedset>
+    <table class="form-table">
       <tr valign="top">
-        <th scope="row"><?php _e('E-mail Address:', 'mlcf') ?></th>
+        <th scope="row"><label><?php _e('E-mail Address:', 'mlcf') ?></label></th>
         <td><input name="mlcf_email" type="text" id="mlcf_email" value="<?php echo $mlcf_email; ?>" size="40" />
         <br />
 <?php _e('This address is where the email will be sent to.', 'mlcf') ?></td>
@@ -78,10 +149,12 @@ $mlcf_field_submit = stripslashes(get_option('mlcf_field_submit'));
 <?php _e('This will be the subject of the email.', 'mlcf') ?></td>
       </tr>
      </table>
+</fieldset>
 
+  <h3><?php _e('Messages', 'mlcf') ?></h3>
 	<fieldset class="options">
-		<legend><?php _e('Messages', 'mlcf') ?></legend>
-		<table width="100%" cellspacing="2" cellpadding="5" class="editform">
+
+    <table class="form-table">
 		  <tr valign="top">
 			<th scope="row"><?php _e('Success Message:', 'mlcf') ?></th>
 			<td><textarea name="mlcf_success_message" id="mlcf_success_message" style="width: 80%;" rows="2" cols="50"><?php echo $mlcf_success_message; ?></textarea>
@@ -104,10 +177,10 @@ $mlcf_field_submit = stripslashes(get_option('mlcf_field_submit'));
 		  </tr>	</table>
 	</fieldset>
 
-	<fieldset class="options">
-		<legend><?php _e('Formfields', 'mlcf') ?></legend>
 
-		<table width="100%" cellspacing="2" cellpadding="5" class="editform">
+  <h3><?php _e('Formfield-Legends', 'mlcf') ?></h3>
+	<fieldset class="options">
+    <table class="form-table">
 		  <tr valign="top">
 			<th scope="row"><?php _e('Name:', 'mlcf') ?></th>
 			<td><textarea name="mlcf_field_name" id="mlcf_field_name" style="width: 80%;" rows="2" cols="50"><?php echo $mlcf_field_name; ?></textarea>
@@ -144,63 +217,89 @@ $mlcf_field_submit = stripslashes(get_option('mlcf_field_submit'));
 		  </tr>
 		</table>
 	</fieldset>
-	<fieldset class="options">
-		<legend><?php _e('Usage', 'mlcf') ?></legend>
-    <p style="margin-left: 6em;">Use <strong>&lt;!--contact form--&gt;</strong> in any post or page.</p>
-  </fieldset>
+	
+  <fieldset class="options">
+  <h3><?php _e('Recaptute Support', 'mlcf') ?></h3>
+    <input name="mlcf_recaptcha_enabled" type="checkbox" id="mlcf_recaptcha_enabled" <?php echo $mlcf_recaptcha_enabled; ?>  />
+    <label for="mlcf_recaptcha_enabled"><?php _e('Enable recaptcha Support', 'mlcf') ?></label>
+    <p>You have to sign up a free Key at <a href="http://www.google.com/recaptcha" title="" target="_blank">recaptcha</a>.</p>
+    <div id="recaptcha">
+      <p class="<?php echo $mlcf_recaptcha_class_enabled ?>" ><?php _e('recaptcha Public Key', 'mlcf') ?><br />
+      <input name="mlcf_recaptcha_public" type="text" id="mlcf_recaptcha_public" <?php echo $mlcf_recaptcha_input_enabled ?> value="<?php echo $mlcf_recaptcha_public; ?>" size="40" />
+      <br />
+      <p class="<?php echo $mlcf_recaptcha_class_enabled ?>"  ><?php _e('recaptcha Private Key', 'mlcf') ?><br />
+      <input name="mlcf_recaptcha_private" type="text" id="mlcf_recaptcha_private" <?php echo $mlcf_recaptcha_input_enabled ?>  value="<?php echo $mlcf_recaptcha_private; ?>" size="40" />
+      <br />
+      <p class="<?php echo $mlcf_recaptcha_class_enabled ?>"  ><?php _e('Recaptcha Error Message', 'mlcf') ?><br />
+      <input name="mlcf_recaptcha_error_msg" type="text" id="mlcf_recaptcha_error_msg" <?php echo $mlcf_recaptcha_input_enabled ?>  value="<?php echo $mlcf_recaptcha_error_msg; ?>" size="40" />
+      <br />
+
+    </div>
+  </div>
+</fieldset>
+
+<fieldset class="options">
+  <h3><?php _e('Keep Options ?', 'mlcf') ?></h3>
+    <input name="mlcf_delete_options" type="checkbox" id="mlcf_delete_options" <?php echo $mlcf_delete_options; ?>  />
+    <label for="mlcf_delete_options"><?php _e('Delete all Options on Plugin Deactivation', 'mlcf') ?></label>
+</fieldset>
+
+<fieldset class="options">
+  <p class="submit">
+    <input id="submitform" type="submit" name="Submit" value="<?php _e('Update Options', 'mlcf') ?> &raquo;" />
+  </p>
+</fieldset>
+
+<br />
+<fieldset class="options">
+  <h3><?php _e('Usage', 'mlcf') ?></h3>
+  <p>Add the following in any post or page using Editors HTML-View:</p>
+    <pre style="font-weight: bold; background: #efefef; border: 1px dashed #444; padding: 1em 1em 1em 2em; width: 40%;">&lt;!--contact form--&gt;</pre>
+</fieldset>
 
  	<fieldset class="options">
-		<legend><?php _e('Styling', 'mlcf') ?></legend>
-    <div style="margin-left: 2em;">
-    <p>Include some styles like the following in your theme</p>
-      <pre>
-          .contactform{ 
-            height: 34em;
-            width: 400px;
-            /* border: 3px dotted green; */
-            margin: 2em;
-          }
-          .contactform input, .contactform textarea{ 
-            width: 300px;
-            margin-bottom: 0.5em;
-            border: 2px solid #3e3f3f;
-          }
-          
-          div.contactleft{ 
-            /* border: 1px dotted blue; */
-            width: 8em;
-            float: left;
-            text-align: right;
-          }
-          div.contactright{ 
-            /* border: 1px dotted yellow; */
-          }
-          .contacrequired{
-            text-align: left;
-            margin-left: 10em;
-          }
-          .contactsubmit{
-          width: 5em !important;
-          float: left;
-          margin-left: 8em;
-          margin-top: 1em;
-          }
-          .mailsend{
-          color: green;
-          }
-      </pre>
-    </div>
-   	</fieldset>
-   		<fieldset class="options">
-		<legend><?php _e('Options', 'mlcf') ?></legend>
-    <p>
-      Delete Options on Plugin Deactivation
-    <input name="mlcf_delete_options" type="checkbox" id="mlcf_delete_options" <?php echo $mlcf_delete_options; ?>  />
-    </p>
-    
-   	</fieldset>
-   <p class="submit">
-      <input type="submit" name="Submit" value="<?php _e('Update Options', 'mlcf') ?> &raquo;" />
-    </p>
+    <h3><?php _e('Styling', 'mlcf') ?></h3>
+    <p>You may include may some styles like the following in the CSS of your theme, but it should work with standard Stylesheets too.</p>
+      <pre style="background: #efefef; border: 1px dashed #444; padding: 1em 1em 1em 2em; width: 40%;">
+.contactform{ 
+  height: 34em;
+  width: 400px;
+  /* border: 3px dotted green; */
+  margin: 2em;
+}
+.contactform input, .contactform textarea{ 
+  width: 300px;
+  margin-bottom: 0.5em;
+  border: 2px solid #3e3f3f;
+}
+
+div.contactleft{ 
+  /* border: 1px dotted blue; */
+  width: 8em;
+  float: left;
+  text-align: right;
+}
+div.contactright{ 
+  /* border: 1px dotted yellow; */
+}
+.contacrequired{
+  text-align: left;
+  margin-left: 10em;
+}
+.contactsubmit{
+width: 5em !important;
+float: left;
+margin-left: 8em;
+margin-top: 1em;
+}
+.mailsend{
+color: green;
+}
+.error{
+color: red;
+}</pre>
+<br />
+</fieldset>
+
   </form>
 </div>

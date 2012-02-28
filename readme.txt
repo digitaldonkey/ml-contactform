@@ -2,13 +2,13 @@
 Tags: contact, template
 Contributors: digitaldonkey, westi, ryanduff, firas
 Requires at least: 1.5
-Tested up to: 3.1
+Tested up to: 3.3.1
 Stable tag: Trunk
 Donate link: http://donkeymedia.eu/2010/08/26/worpress-multilingual-contactform/
 
 == Description ==
 Multilang Contact Form is a very simple and easy contact form compatible with qtranslate. It can be
-implemented on a page or a post.
+implemented on a page or a post. Optionally you can enable reCapture against spam.
 
 == Installation ==
 
@@ -30,6 +30,10 @@ You need to add the `< !--contact form-->` (without the space at before the excl
 2. The Form
 
 == Upgrade Notice ==
+
+= 1.4 =
+Added optional reCapture Antispam Support.
+Added comments to TinyMce valid Elements, that the Tag won't get deleted, when switching to html mode.
 
 = 1.2 =
 Added Option to set a From-Field for the received mails.
