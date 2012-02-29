@@ -1,38 +1,30 @@
-<style type='text/css' title='text/css'>
+<style type='text/css'>
   .disabled{ color: #999; }
 </style>
 <script type='text/javascript'>
   jQuery(document).ready(function(){
-  
-  // can I use jquery here??? 
-  
-  jQuery('#mlcf_recaptcha_enabled').bind('change', function(){
+    jQuery('#mlcf_recaptcha_enabled').bind('change', function(){
       
-    if( jQuery(this).attr('checked') ){
-      jQuery('#mlcf_recaptcha_public, #mlcf_recaptcha_private').attr('disabled', false).removeClass('disabled');
-      jQuery('.mlcf_recaptcha_class_enabled').toggleClass('disabled');  
-    }
-    else{
-      jQuery('#mlcf_recaptcha_public, #mlcf_recaptcha_private').attr('disabled', true).addClass('disabled');
-      jQuery('.mlcf_recaptcha_class_enabled').toggleClass('disabled');  
-    }
-      
-  });
-  
-  jQuery('#submitform').click(function(){
+      if( jQuery(this).attr('checked') ){
+        jQuery('#mlcf_recaptcha_public, #mlcf_recaptcha_private').attr('disabled', false).removeClass('disabled');
+        jQuery('.mlcf_recaptcha_class_enabled').toggleClass('disabled');  
+      }
+      else{
+        jQuery('#mlcf_recaptcha_public, #mlcf_recaptcha_private').attr('disabled', true).addClass('disabled');
+        jQuery('.mlcf_recaptcha_class_enabled').toggleClass('disabled');  
+      }
+    });
     
-    /* recaptcha validation */
-    if ( jQuery('#mlcf_recaptcha_enabled').attr('checked') ){
-        if ( jQuery('#mlcf_recaptcha_public').val().length < 8 || jQuery('#mlcf_recaptcha_private').val().length < 8 ){            
-            jQuery('#mlcf_recaptcha_public, #mlcf_recaptcha_private').css('border', '1px solid red');
-            alert('Please check you public and private key or Disable recaptcha support. Each should have at least 8 digits');
-            return false;
-        }
-        
-    }
-    
+    jQuery('#submitform').click(function(){
+      /* recaptcha validation */
+      if ( jQuery('#mlcf_recaptcha_enabled').attr('checked') ){
+          if ( jQuery('#mlcf_recaptcha_public').val().length < 8 || jQuery('#mlcf_recaptcha_private').val().length < 8 ){            
+              jQuery('#mlcf_recaptcha_public, #mlcf_recaptcha_private').css('border', '1px solid red');
+              alert('Please check you public and private key or Disable recaptcha support. Each should have at least 8 digits');
+              return false;
+          }     
+      }
   });
-
 });
 </script>
 <?php
@@ -40,7 +32,7 @@
 /*Lets add some default options if they don't exist*/
 add_option('mlcf_delete_options', true, 'mlcf'); // by default the text strings will be deleted on Plugin deactivation.
 add_option('mlcf_email', 'you@example.com', 'mlcf');
-add_option('mlcf_subject', '[:en]English email from donkeymedia.eu[:de]Deutsche e-Mail von donkeymedia.eu', 'mlcf');
+add_option('mlcf_subject', '[:en]English email from yourdomain.com[:de]Deutsche e-Mail von yourdomain.com', 'mlcf');
 add_option('mlcf_email_from', 'contactform@yourdomain.com', 'mlcf');
 add_option('mlcf_success_message','[:en]Thank you! <br />email successfully sent[:de]Vielen Dank<br />e-Mail erfolgreich versandt', 'mlcf');
 add_option('mlcf_error_message', '[:en]<span class="error">Please fill in the required fields</span>[:de]<span class="error">Bitte füllen Sie alle notwendigen Felder aus</span>', 'mlcf');
@@ -57,15 +49,6 @@ add_option('mlcf_recaptcha_enabled', false, 'mlcf');
 add_option('mlcf_recaptcha_private', '6Le-tcQSAAAAAF0zyxYijsjUOL3AnSJaLmN-IEw-', 'mlcf');
 add_option('mlcf_recaptcha_public', '6Le-tcQSAAAAADDyIpTh9wP8to_4HHeSMkp6KNTN', 'mlcf');
 add_option('mlcf_recaptcha_error_msg', '<span class="error">'."[:en]The reCAPTCHA wasn't entered correctly. Please try again</span>[:de]".'<span class="error">'."Das Captcha stimmt nicht.", 'mlcf');
-
-
-/*
-
-@TODO ERROR MESSAGE
-
-*/
-add_option('mlcf_recaptcha_errormsg', '6Le-tcQSAAAAADDyIpTh9wP8to_4HHeSMkp6KNTN', 'mlcf');
-
 
 /*check form submission and update options*/
 if ('process' == $_POST['stage'])
@@ -122,31 +105,31 @@ $mlcf_recaptcha_public = stripslashes(get_option('mlcf_recaptcha_public'));
 $mlcf_delete_options = get_option('mlcf_delete_options') ? ' value="true" checked="checked"' : 'value="false"';
 ?>
 
-<div class="wrap">
+<div class="wrap clear">
   <h2><?php _e('Contact Form Options', 'mlcf') ?></h2>
-  <form name="form1" method="post" action="">
+  <form name="form1" method="post" action="#">
 	<input type="hidden" name="stage" value="process" />
 	
   <h3><?php _e('Contact email', 'mlcf') ?></h3>
-  <filedset>
+  <fieldset>
     <table class="form-table">
-      <tr valign="top">
+      <tr>
         <th scope="row"><label><?php _e('E-mail Address:', 'mlcf') ?></label></th>
         <td><input name="mlcf_email" type="text" id="mlcf_email" value="<?php echo $mlcf_email; ?>" size="40" />
         <br />
 <?php _e('This address is where the email will be sent to.', 'mlcf') ?></td>
       </tr>
-      <tr valign="top">
+      <tr>
         <th scope="row"><?php _e('From e-mail Address:', 'mlcf') ?></th>
         <td><input name="mlcf_email_from" type="text" id="mlcf_email_from" value="<?php echo $mlcf_email_from; ?>" size="40" />
         <br />
-<?php _e('This address will be shown in the From Field in the mails you recive via the plugin', 'mlcf') ?></td>
+<?php _e('This address will be shown in the From Field in the mails you recive via mailform.', 'mlcf') ?></td>
       </tr>
-      <tr valign="top">
+      <tr>
         <th scope="row"><?php _e('Subject Suffix:', 'mlcf') ?></th>
         <td><input name="mlcf_subject" type="text" id="mlcf_subject" value="<?php echo $mlcf_subject; ?>" size="50" />
         <br />
-<?php _e('This will be the subject of the email.', 'mlcf') ?></td>
+<?php _e('This will be prepended to subject of the mailform subject.', 'mlcf') ?></td>
       </tr>
      </table>
 </fieldset>
@@ -155,62 +138,72 @@ $mlcf_delete_options = get_option('mlcf_delete_options') ? ' value="true" checke
 	<fieldset class="options">
 
     <table class="form-table">
-		  <tr valign="top">
-			<th scope="row"><?php _e('Success Message:', 'mlcf') ?></th>
-			<td><textarea name="mlcf_success_message" id="mlcf_success_message" style="width: 80%;" rows="2" cols="50"><?php echo $mlcf_success_message; ?></textarea>
-			<br />
-	<?php _e('When the form is sucessfully submitted, this is the message the user will see.', 'mlcf') ?></td>
+		  
+		  <tr>
+        <th scope="row"><?php _e('Success Message:', 'mlcf') ?></th>
+        <td>
+            <textarea name="mlcf_success_message" id="mlcf_success_message" style="width: 80%;" rows="2" cols="50"><?php echo $mlcf_success_message; ?></textarea>
+            <br />
+            <?php _e('When the form is sucessfully submitted, this is the message the user will see.', 'mlcf') ?>
+        </td>
 		  </tr>
-		  <tr valign="top">
-			<th scope="row"><?php _e('Error Message:', 'mlcf') ?></th>
-			<td><textarea name="mlcf_error_message" id="mlcf_error_message" style="width: 80%;" rows="2" cols="50"><?php echo $mlcf_error_message; ?></textarea>
-			<br />
-	<?php _e('If the user skips a required field, this is the message he will see.', 'mlcf') ?> <br />
-	<?php _e('You can apply CSS to this text by wrapping it in <code>&lt;p style="[your CSS here]"&gt; &lt;/p&gt;</code>.', 'mlcf') ?><br />
-	<?php _e('ie. <code>&lt;p style="color:red;"&gt;Please fill in the required fields.&lt;/p&gt;</code>.', 'mlcf') ?></td>
+		  <tr>
+        <th scope="row"><?php _e('Error Message:', 'mlcf') ?></th>
+			  <td>
+			    <textarea name="mlcf_error_message" id="mlcf_error_message" style="width: 80%;" rows="2" cols="50"><?php echo $mlcf_error_message; ?></textarea>
+      			<br />
+          	<?php _e('If the user skips a required field, this is the message he will see.', 'mlcf') ?> <br />
+          	<?php _e('You can apply CSS to this text by wrapping it in <code>&lt;p style="[your CSS here]"&gt; &lt;/p&gt;</code>.', 'mlcf') ?>
+          	<br />
+          	<?php _e('ie. <code>&lt;p style="color:red;"&gt;Please fill in the required fields.&lt;/p&gt;</code>.', 'mlcf') ?>
+        </td>
 		  </tr>
-<tr valign="top">
+      <tr>
 			<th scope="row"><?php _e('Wrong email Adress Message:', 'mlcf') ?></th>
-			<td><textarea name="mlcf_error_wrong_mail" id="mlcf_error_wrong_mail" style="width: 80%;" rows="2" cols="50"><?php echo $mlcf_error_wrong_mail; ?></textarea>
-			<br />
-	<?php _e('If the user enters a invalid email adress.', 'mlcf') ?> <br />
-		  </tr>	</table>
+			<td>
+			  <textarea name="mlcf_error_wrong_mail" id="mlcf_error_wrong_mail" style="width: 80%;" rows="2" cols="50"><?php echo $mlcf_error_wrong_mail; ?></textarea>
+  			<br />
+	      <?php _e('If the user enters a invalid email adress.', 'mlcf') ?>
+	      <br />
+  	    </td>
+		  </tr>
+	  </table>
 	</fieldset>
 
 
   <h3><?php _e('Formfield-Legends', 'mlcf') ?></h3>
 	<fieldset class="options">
     <table class="form-table">
-		  <tr valign="top">
+		  <tr>
 			<th scope="row"><?php _e('Name:', 'mlcf') ?></th>
 			<td><textarea name="mlcf_field_name" id="mlcf_field_name" style="width: 80%;" rows="2" cols="50"><?php echo $mlcf_field_name; ?></textarea>
 			</td>
 		  </tr>
-		  <tr valign="top">
+		  <tr>
 			<th scope="row"><?php _e('Email:', 'mlcf') ?></th>
 			<td><textarea name="mlcf_field_email" id="mlcf_field_email" style="width: 80%;" rows="2" cols="50"><?php echo $mlcf_field_email; ?></textarea>
 			</td>
 		  </tr>
-<tr valign="top">
+      <tr>
 			<th scope="row"><?php _e('Subject:', 'mlcf') ?></th>
 			<td><textarea name="mlcf_field_subject" id="mlcf_field_subject" style="width: 80%;" rows="2" cols="50"><?php echo $mlcf_field_subject; ?></textarea>
 			</td>
-		  </tr>		  <tr valign="top">
+		  </tr>		  <tr>
 			<th scope="row"><?php _e('www:', 'mlcf') ?></th>
 			<td><textarea name="mlcf_field_www" id="mlcf_field_www" style="width: 80%;" rows="2" cols="50"><?php echo $mlcf_field_www; ?></textarea>
 			</td>
 		  </tr>
-		  <tr valign="top">
+		  <tr>
 			<th scope="row"><?php _e('Message:', 'mlcf') ?></th>
 			<td><textarea name="mlcf_field_message" id="mlcf_field_message" style="width: 80%;" rows="2" cols="50"><?php echo $mlcf_field_message; ?></textarea>
 			</td>
 		  </tr>
-		  <tr valign="top">
+		  <tr>
 			<th scope="row"><?php _e('Required:', 'mlcf') ?></th>
 			<td><textarea name="mlcf_field_required" id="mlcf_field_required" style="width: 80%;" rows="2" cols="50"><?php echo $mlcf_field_required; ?></textarea>
 			</td>
 		  </tr>
-      <tr valign="top">
+      <tr>
 			<th scope="row"><?php _e('Submit:', 'mlcf') ?></th>
 			<td><textarea name="mlcf_field_submit" id="mlcf_field_submit" style="width: 80%;" rows="1" cols="20"><?php echo $mlcf_field_submit; ?></textarea>
 			</td>
@@ -218,7 +211,7 @@ $mlcf_delete_options = get_option('mlcf_delete_options') ? ' value="true" checke
 		</table>
 	</fieldset>
 	
-  <fieldset class="options">
+<fieldset class="options">
   <h3><?php _e('Recaptute Support', 'mlcf') ?></h3>
     <input name="mlcf_recaptcha_enabled" type="checkbox" id="mlcf_recaptcha_enabled" <?php echo $mlcf_recaptcha_enabled; ?>  />
     <label for="mlcf_recaptcha_enabled"><?php _e('Enable recaptcha Support', 'mlcf') ?></label>
@@ -226,16 +219,14 @@ $mlcf_delete_options = get_option('mlcf_delete_options') ? ' value="true" checke
     <div id="recaptcha">
       <p class="<?php echo $mlcf_recaptcha_class_enabled ?>" ><?php _e('recaptcha Public Key', 'mlcf') ?><br />
       <input name="mlcf_recaptcha_public" type="text" id="mlcf_recaptcha_public" <?php echo $mlcf_recaptcha_input_enabled ?> value="<?php echo $mlcf_recaptcha_public; ?>" size="40" />
-      <br />
+      </p>
       <p class="<?php echo $mlcf_recaptcha_class_enabled ?>"  ><?php _e('recaptcha Private Key', 'mlcf') ?><br />
       <input name="mlcf_recaptcha_private" type="text" id="mlcf_recaptcha_private" <?php echo $mlcf_recaptcha_input_enabled ?>  value="<?php echo $mlcf_recaptcha_private; ?>" size="40" />
-      <br />
+      </p>
       <p class="<?php echo $mlcf_recaptcha_class_enabled ?>"  ><?php _e('Recaptcha Error Message', 'mlcf') ?><br />
       <input name="mlcf_recaptcha_error_msg" type="text" id="mlcf_recaptcha_error_msg" <?php echo $mlcf_recaptcha_input_enabled ?>  value="<?php echo $mlcf_recaptcha_error_msg; ?>" size="40" />
-      <br />
-
+      </p>
     </div>
-  </div>
 </fieldset>
 
 <fieldset class="options">
