@@ -125,22 +125,14 @@ function mlcf_check_email($email) {
   return preg_match("/^$regex$/",$email);
 }
 
-
-/* Wrapper function to use in a Template .*/
-function mlcf_form(){
-  mlcf_callback($content, true);
+/* Replace Conten Tag */
+function mclf_tag_replace( $atts ) {
+    return mlcf_form();
 }
-
-
 /*Wrapper function which calls the form.*/
-function mlcf_callback( $content , $templateTag=false) {
+function mlcf_form() {
 	global $mlcf_strings;
 
-	/* Run the input check. */		
-	if(false === strpos($content, '<!--contact form-->') and !$templateTag) {
-		return $content;
-	}
-  
      //recaptcha
         $recaptcha_html ='';
         $recaptcha_enabled = false;
@@ -256,11 +248,7 @@ function mlcf_callback( $content , $templateTag=false) {
               </div>
         	</form>
         </div>';
-        if ($templateTag){
-          echo $form;
-        }else{
-          return str_replace('<!--contact form-->', $form, $content);
-        }
+      return $form;
     }
 }
 
@@ -331,14 +319,9 @@ function mclf_deactivate(){
     delete_option('mlcf_field_submit');
    }
 }
-/* don't let Tinymce remove all comments */
-function mlcf_mce_valid_elements($init){
-  $init['extended_valid_elements'] = '!--,'.$init['extended_valid_elements'];
-}
 
 /* Action calls for all functions */
 add_action('admin_menu', 'mlcf_add_options_page');
-add_filter('the_content', 'mlcf_callback', 7);
-add_filter('tiny_mce_before_init', 'mlcf_mce_valid_elements');
+add_shortcode( 'contact_form', 'mclf_tag_replace' );
 
 ?>

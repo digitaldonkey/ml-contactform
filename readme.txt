@@ -15,14 +15,14 @@ implemented on a page or a post. Optionally you can enable reCapture against spa
 1. Upload to your plugins folder, usually `wp-content/plugins/`
 2. Activate the plugin on the plugin screen.
 3. Configure the plugin on it's settings screen. Settings ... Contact Form
-4. Add the `< !--contact form-->`(without the space at before the exclamation mark!) to the body of the post/page in the editors HTML mode.
+4. Add the `[contact_form]` to the body of the post/page in the editors HTML mode.
 
 
 == Frequently Asked Questions ==
 
 = How do I add the contact form to a post/page? =
 
-You need to add the `< !--contact form-->` (without the space at before the exclamation mark!) to the body of the post/page in the editors HTML mode.
+You need to add the `[contact_form]` to the body of the post/page in the editors HTML mode.
 
 == Screenshots ==
 
@@ -30,6 +30,10 @@ You need to add the `< !--contact form-->` (without the space at before the excl
 2. The Form
 
 == Upgrade Notice ==
+
+= 1.5 =
+Changed Tag-Replace to current Wordpress Standard.
+This will fix the WYSISYG errors appearing in latest Wordpress versions
 
 = 1.4 =
 Added optional reCapture Antispam Support.
